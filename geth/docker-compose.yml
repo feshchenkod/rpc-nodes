@@ -1,0 +1,83 @@
+version: "3.7"
+
+services:
+  geth-pruning:
+    image: ethereum/client-go:stable
+    container_name: geth-pruning
+    restart: always
+    env_file: .env
+    command: "snapshot prune-state"
+    volumes:
+      - ./geth-data:/root/.ethereum
+  geth:
+    image: ethereum/client-go:stable
+    container_name: geth
+    restart: always
+    env_file: .env
+    command:
+      - --maxpeers
+      - "50"
+      - --cache
+      - "10629"
+      - --port
+      - "${P2P_PORT}"
+      - --nat
+      - "any"
+      - --http
+      - --http.addr
+      - "0.0.0.0"
+      - --http.port
+      - "${HTTP_PORT}"
+      - --http.corsdomain=*
+      - --http.vhosts=*
+      - --http.api
+      - "eth,net,web3"
+      - --ws
+      - --ws.addr
+      - "0.0.0.0"
+      - --ws.port
+      - "${WS_PORT}"
+      - --ws.origins=*
+      - --ws.api
+      - "eth,net,web3"
+      - --rpc.gascap
+      - "0"
+      - --rpc.txfeecap
+      - "0"
+    ports:
+      # - ${HTTP_PORT}:${HTTP_PORT}
+      # - ${WS_PORT}:${WS_PORT}
+      - ${P2P_PORT}:${P2P_PORT}
+    volumes:
+      - ./geth-data:/root/.ethereum
+    stop_grace_period: 3m30s
+    stop_signal: SIGINT
+    healthcheck:
+      test: wget -nv -t1 --spider 'http://127.0.0.1:${HTTP_PORT}/' || exit 1
+      interval: 5s
+      timeout: 10s
+      retries: 3
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.geth-http.middlewares=geth-http-acl"
+      - "traefik.http.middlewares.geth-http.headers.customrequestheaders.Access-Control-Allow-Origin=*"
+      - "traefik.http.middlewares.geth-http-acl.ipwhitelist.sourcerange=127.0.0.1/32, ${ALLOW_FROM}"
+      - "traefik.http.routers.geth-http.service=geth-http"
+      - "traefik.http.routers.geth-http.rule=Host(`${DOMAIN}`) && Path(`/geth-http/`)"
+      - "traefik.http.routers.geth-http.entrypoints=websecure"
+      - "traefik.http.routers.geth-http.tls.certresolver=myresolver"
+      - "traefik.http.services.geth-http.loadbalancer.server.port=${HTTP_PORT}"
+      - "traefik.http.routers.geth-ws.middlewares=geth-ws-acl"
+      - "traefik.http.middlewares.geth-ws.headers.customrequestheaders.Access-Control-Allow-Origin=*"
+      - "traefik.http.middlewares.geth-ws-acl.ipwhitelist.sourcerange=127.0.0.1/32, ${ALLOW_FROM}"
+      - "traefik.http.routers.geth-ws.service=geth-ws"
+      - "traefik.http.routers.geth-ws.rule=Host(`${DOMAIN}`) && Path(`/geth-ws/`)"
+      - "traefik.http.routers.geth-ws.entrypoints=websecure"
+      - "traefik.http.routers.geth-ws.tls.certresolver=myresolver"
+      - "traefik.http.services.geth-ws.loadbalancer.server.port=${WS_PORT}"
+    networks:
+      - rpc
+
+networks:
+  rpc:
+    name: rpc-shared-network

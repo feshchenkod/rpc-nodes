@@ -1,0 +1,72 @@
+version: "3.7"
+services:
+  nethermind:
+    image: nethermind/nethermind:latest
+    container_name: nethermind
+    restart: always
+    env_file: .env
+    stop_grace_period: 2m
+    ports:
+      # - ${HTTP_PORT}:${HTTP_PORT}
+      # - ${WS_PORT}:${WS_PORT}
+      - ${P2P_PORT}:${P2P_PORT}/tcp
+      - ${P2P_PORT}:${P2P_PORT}/udp
+    command:
+      - --datadir
+      - /var/lib/nethermind
+      - --Init.WebSocketsEnabled
+      - "true"
+      - --Network.DiscoveryPort
+      - "${P2P_PORT}"
+      - --Network.P2PPort
+      - "${P2P_PORT}"
+      - --JsonRpc.Enabled
+      - "true"
+      - --JsonRpc.EnabledModules
+      - "Web3,Eth,Subscribe,Net,Parity"
+      - --JsonRpc.Host
+      - "0.0.0.0"
+      - --JsonRpc.Port
+      - "${HTTP_PORT}"
+      - --JsonRpc.WebSocketsPort
+      - "${WS_PORT}"
+      - --Sync.FastSync
+      - "true"
+      - --config
+      - xdai
+      - --Pruning.Enabled
+      - "true"
+      - --Pruning.CacheMb
+      - "4096"
+      - --TxPool.Size
+      - "4096"
+      - --Sync.AncientBodiesBarrier
+      - "1"
+      - --Sync.AncientReceiptsBarrier
+      - "1"
+    volumes:
+      - ./nethermind-data:/var/lib/nethermind
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nm-http.middlewares=nm-http-acl"
+      - "traefik.http.middlewares.nm-http.headers.customrequestheaders.Access-Control-Allow-Origin=*"
+      - "traefik.http.middlewares.nm-http-acl.ipwhitelist.sourcerange=127.0.0.1/32, ${ALLOW_FROM}"
+      - "traefik.http.routers.nm-http.service=nm-http"
+      - "traefik.http.routers.nm-http.rule=Host(`${DOMAIN}`) && Path(`/nm-http/`)"
+      - "traefik.http.routers.nm-http.entrypoints=websecure"
+      - "traefik.http.routers.nm-http.tls.certresolver=myresolver"
+      - "traefik.http.services.nm-http.loadbalancer.server.port=${HTTP_PORT}"
+      - "traefik.http.routers.nm-ws.middlewares=nm-ws-acl"
+      - "traefik.http.middlewares.nm-ws.headers.customrequestheaders.Access-Control-Allow-Origin=*"
+      - "traefik.http.middlewares.nm-ws-acl.ipwhitelist.sourcerange=127.0.0.1/32, ${ALLOW_FROM}"
+      - "traefik.http.routers.nm-ws.service=nm-ws"
+      - "traefik.http.routers.nm-ws.rule=Host(`${DOMAIN}`) && Path(`/nm-ws/`)"
+      - "traefik.http.routers.nm-ws.entrypoints=websecure"
+      - "traefik.http.routers.nm-ws.tls.certresolver=myresolver"
+      - "traefik.http.services.nm-ws.loadbalancer.server.port=${WS_PORT}"
+    networks:
+      - rpc
+
+networks:
+  rpc:
+    name: rpc-shared-network
