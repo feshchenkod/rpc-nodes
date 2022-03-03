@@ -21,3 +21,6 @@ docker-compose up -d
 * Polygon - [bor.md](/bor/bor.md)
 * BSC - [bsc.md](/bsc/bsc.md)
 * Xdai - [nethermind.md](/nethermind/nethermind.md)
+
+## 3. Monitoring
+[Visit the repository with instructions on how to install Zabbix template for blockchain nodes here.](https://github.com/feshchenkod/zabbix-templates#rpc-nodes-geth-bsc-bor-etc)
