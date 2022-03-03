@@ -2,7 +2,7 @@
 
 ## Requirements for Ethereum network
 * memory: 48Gb
-* disk: 3Tb SSD (require periodically prune state)
+* disk: 3Tb SSD (require periodically prune state) - the size increases quickly, so you need to periodically check the remaining space.
 
 ## Installation
 Set in the `.env` file:
@@ -28,7 +28,7 @@ docker-compose up -d bsc
 ```
 
 ## Pruning 
-Use it if the size is approaching 800 GB. At least 150 GB must be free for successful pruning.
+Use it if the size is approaching 2.6TB. At least 150 GB must be free for successful pruning.
 ```bash
 docker-compose down
 docker-compose up bsc-pruning

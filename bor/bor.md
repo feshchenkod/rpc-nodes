@@ -2,7 +2,7 @@
 
 ## Requirements for Polygon network
 * memory: 64Gb (minimum)
-* disk: 3Tb SSD (require periodically prune state)
+* disk: 3Tb SSD (require periodically prune state) - you can use less if you prune more often, but you still need at least 2TB.
 
 ## Installation
 Set in the `.env` file:
