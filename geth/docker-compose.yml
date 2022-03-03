@@ -4,7 +4,7 @@ services:
   geth-pruning:
     image: ethereum/client-go:stable
     container_name: geth-pruning
-    restart: always
+    restart: "no"
     env_file: .env
     command: "snapshot prune-state"
     volumes:
@@ -31,7 +31,7 @@ services:
       - --http.corsdomain=*
       - --http.vhosts=*
       - --http.api
-      - "eth,net,web3"
+      - "eth,net,web3,txpool"
       - --ws
       - --ws.addr
       - "0.0.0.0"
@@ -39,7 +39,17 @@ services:
       - "${WS_PORT}"
       - --ws.origins=*
       - --ws.api
-      - "eth,net,web3"
+      - "eth,net,web3,txpool"
+      - --txpool.locals
+      - "${TX_LOCAL_ADDR}"
+      - --txpool.accountslots
+      - "32"
+      - --txpool.globalslots
+      - "8192"
+      - --txpool.accountqueue
+      - "128"
+      - --txpool.globalqueue
+      - "2048"
       - --rpc.gascap
       - "0"
       - --rpc.txfeecap

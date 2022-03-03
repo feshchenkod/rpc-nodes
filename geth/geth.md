@@ -5,7 +5,7 @@
 * disk: 1Tb SSD (if you periodically prune state)
 
 ## Installation
-Set the domain name to be used in the `.env` file. You can also set a list of allowed IP addresses there. Rename `example.env` to `.env`:
+Set the domain name to be used in the `.env` file. You can also set a list of allowed IP addresses there and addresses to treat as local. Rename `example.env` to `.env`:
 ```
 mv example.env .env
 ```
