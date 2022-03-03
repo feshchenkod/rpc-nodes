@@ -21,7 +21,8 @@ docker-compose pull
 docker-compose up -d geth
 ```
 
-## Pruning
+## Pruning 
+Use it if the size is approaching 800 GB. At least 120 GB must be free for successful pruning.
 ```bash
 docker-compose down
 docker-compose up geth-pruning
