@@ -2,7 +2,7 @@
 
 ## Requirements for Ethereum network
 * memory: 32Gb
-* disk: 1Tb SSD (if you periodically prune state)
+* disk: 1Tb SSD (require periodically prune state)
 
 ## Installation
 Set the domain name to be used in the `.env` file. You can also set a list of allowed IP addresses there and addresses to treat as local. Rename `example.env` to `.env`:
