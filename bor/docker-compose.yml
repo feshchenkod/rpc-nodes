@@ -109,7 +109,6 @@ services:
       - /var/lib/bor/data
       - --cache
       - ${BOR_CACHE}
-      - --snapshot=false
       - --gcmode
       - ${BOR_MODE}
       - --ws
