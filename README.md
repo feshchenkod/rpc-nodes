@@ -1,6 +1,6 @@
 # rpc-nodes
 
-## 1. Start proxy (traefik)
+## 1. Start traefik proxy (you can skip this step if you are not going to use traefik)
 Create a shared network for running containers:
 ```bash
 docker network create rpc-shared-network

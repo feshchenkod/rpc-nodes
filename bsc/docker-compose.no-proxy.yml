@@ -1,0 +1,66 @@
+version: "3.7"
+
+services:
+  bsc-pruning:
+    image: bsc:local
+    container_name: bsc-pruning
+    entrypoint:
+      - bsc
+      - snapshot
+      - prune-state
+    restart: "no"
+    volumes:
+      - ./bsc-data:/root/.ethereum
+      - ./config.toml:/root/.ethereum/config.toml
+
+  bsc:
+    image: bsc:local
+    build: 
+      context: .
+      args:
+        - BSC_TAG=${BSC_TAG}
+    container_name: bsc
+    env_file: .env
+    entrypoint:
+      - docker-entrypoint.sh
+      - bsc
+      - --config
+      - "/root/.ethereum/config.toml"
+      - --port
+      - "${P2P_PORT}"
+      - --rpc.allow-unprotected-txs
+      - --http
+      - --http.addr
+      - "0.0.0.0"
+      - --http.port
+      - "${HTTP_PORT}"
+      - --http.corsdomain=*
+      - --http.vhosts=*
+      - --http.api
+      - "eth,net,web3,parlia,txpool"
+      - --ws
+      - --ws.addr
+      - "0.0.0.0"
+      - --ws.port
+      - "${WS_PORT}"
+      - --ws.origins=*
+      - --ws.api
+      - "eth,net,web3,txpool"
+      - --txpool.pricelimit
+      - "1"
+      - --txpool.reannouncetime
+      - "1m"
+      - --txpool.locals
+      - "${TX_LOCAL_ADDR}"
+      - --cache
+      - "20480"
+    restart: always
+    stop_grace_period: 4m
+    stop_signal: SIGINT
+    ports:
+      - ${HTTP_PORT}:${HTTP_PORT}
+      - ${WS_PORT}:${WS_PORT}
+      - ${P2P_PORT}:${P2P_PORT}
+    volumes:
+      - ./bsc-data:/root/.ethereum
+      - ./config.toml:/root/.ethereum/config.toml

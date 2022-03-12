@@ -10,7 +10,7 @@ Set the domain name to be used in the `.env` file. You can also set a list of al
 mv example.env .env
 ```
 
-Start node:
+Start node (If you do not use traefik, specify the compose file with the `-f docker-compose.no-proxy.yml`):
 ```bash
 docker-compose up -d geth
 ```

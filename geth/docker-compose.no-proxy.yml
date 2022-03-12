@@ -1,0 +1,69 @@
+version: "3.7"
+
+services:
+  geth-pruning:
+    image: ethereum/client-go:stable
+    container_name: geth-pruning
+    restart: "no"
+    env_file: .env
+    command: "snapshot prune-state"
+    volumes:
+      - ./geth-data:/root/.ethereum
+  geth:
+    image: ethereum/client-go:stable
+    container_name: geth
+    restart: always
+    env_file: .env
+    command:
+      - --maxpeers
+      - "50"
+      - --cache
+      - "10629"
+      - --port
+      - "${P2P_PORT}"
+      - --nat
+      - "any"
+      - --http
+      - --http.addr
+      - "0.0.0.0"
+      - --http.port
+      - "${HTTP_PORT}"
+      - --http.corsdomain=*
+      - --http.vhosts=*
+      - --http.api
+      - "eth,net,web3,txpool"
+      - --ws
+      - --ws.addr
+      - "0.0.0.0"
+      - --ws.port
+      - "${WS_PORT}"
+      - --ws.origins=*
+      - --ws.api
+      - "eth,net,web3,txpool"
+      - --txpool.locals
+      - "${TX_LOCAL_ADDR}"
+      - --txpool.accountslots
+      - "32"
+      - --txpool.globalslots
+      - "8192"
+      - --txpool.accountqueue
+      - "128"
+      - --txpool.globalqueue
+      - "2048"
+      - --rpc.gascap
+      - "0"
+      - --rpc.txfeecap
+      - "0"
+    ports:
+      - ${HTTP_PORT}:${HTTP_PORT}
+      - ${WS_PORT}:${WS_PORT}
+      - ${P2P_PORT}:${P2P_PORT}
+    volumes:
+      - ./geth-data:/root/.ethereum
+    stop_grace_period: 3m30s
+    stop_signal: SIGINT
+    healthcheck:
+      test: wget -nv -t1 --spider 'http://127.0.0.1:${HTTP_PORT}/' || exit 1
+      interval: 5s
+      timeout: 10s
+      retries: 3

@@ -14,14 +14,14 @@ You can also set a list of allowed IP addresses there and addresses to treat as 
 mv example.env .env
 ```
 
-Start node:
+Start node (If you do not use traefik, specify the compose file with the `-f docker-compose.no-proxy.yml`):
 ```bash
 docker-compose build
 docker-compose up -d rabbitmq heimdalld heimdallr bor
 ```
 
 ## Upgrade
-Periodically check for new versions. if there is a release, then you need to update the tag in the environment file. 
+Periodically check for new versions. if there is a release, then you need to update the tag (`BOR_TAG`) in the environment file. 
 ```bash
 docker-compose build
 docker-compose pull

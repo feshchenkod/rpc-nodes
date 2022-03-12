@@ -1,0 +1,156 @@
+version: "3.7"
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-alpine
+    restart: unless-stopped
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    expose:
+      - "5672/tcp"
+
+  heimdalld:
+    build:
+      context: .
+      dockerfile: Dockerfile.heimdall
+      args:
+        - DOCKER_TAG=${HEIMDALL_TAG}
+    image: heimdall:local
+    user: root
+    environment:
+      - HEIMDALL_CHAIN_ID=${HEIMDALL_CHAIN_ID}
+      - HEIMDALL_SNAPSHOT_FILE=${HEIMDALL_SNAPSHOT_FILE}
+      - HEIMDALL_GENESIS_URL=${HEIMDALL_GENESIS_URL}
+      - HEIMDALL_SEEDS=${HEIMDALL_SEEDS}
+      - HEIMDALL_BOR_RPC_URL=${HEIMDALL_BOR_RPC_URL}
+      - HEIMDALL_ETH_RPC_URL=${HEIMDALL_ETH_RPC_URL}
+    restart: unless-stopped
+    stop_grace_period: 2m
+    depends_on:
+      - rabbitmq
+    entrypoint:
+      - docker-entrypoint.sh
+      - heimdalld
+      - --home
+      - /var/lib/heimdall
+      - start
+    volumes:
+      - ./heimdall-data:/var/lib/heimdall
+      - /etc/localtime:/etc/localtime:ro
+    expose:
+      - "26657/tcp"
+    ports:
+      - "26656:26656"
+
+  heimdallr:
+    image: heimdall:local
+    restart: unless-stopped
+    stop_grace_period: 2m
+    depends_on:
+      - heimdalld
+    volumes:
+      - ./heimdall-data:/var/lib/heimdall
+      - /etc/localtime:/etc/localtime:ro
+    expose:
+      - "1317/tcp"
+    user: root
+    entrypoint:
+      - heimdalld
+      - --home
+      - /var/lib/heimdall
+      - rest-server
+      - --chain-id=137
+      - --laddr=tcp://0.0.0.0:1317
+      - --node=tcp://heimdalld:26657
+
+  prune-bor:
+    image: bor:local
+    restart: "no"
+    stop_grace_period: 3m
+    user: root
+    volumes:
+      - ./bor-data:/var/lib/bor
+      - /etc/localtime:/etc/localtime:ro
+    entrypoint:
+      - bor
+      - --datadir
+      - /var/lib/bor/data
+      - snapshot
+      - prune-state
+
+  bor:
+    image: bor:local
+    build:
+      context: .
+      dockerfile: ${BOR_DOCKER_FILE}
+      args:
+        - BUILD_TARGET=${BOR_SRC_TAG}
+        - DOCKER_TAG=${BOR_TAG}
+    restart: unless-stopped
+    stop_grace_period: 7m
+    user: root
+    environment:
+      - BOR_DIR=/var/lib/bor
+      - BOR_SETUP=${BOR_SETUP}
+      - BOR_GENESIS=${BOR_GENESIS}
+      - BOR_ARCHIVE_NODE_SNAPSHOT_FILE=${BOR_ARCHIVE_NODE_SNAPSHOT_FILE}
+      - BOR_FULL_NODE_SNAPSHOT_FILE=${BOR_FULL_NODE_SNAPSHOT_FILE}
+      - BOR_MODE=${BOR_MODE}
+    entrypoint: 
+      - docker-entrypoint.sh
+      - bor
+      - --datadir
+      - /var/lib/bor/data
+      - --cache
+      - ${BOR_CACHE}
+      - --snapshot=false
+      - --gcmode
+      - ${BOR_MODE}
+      - --ws
+      - --ws.port
+      - ${BOR_WS_PORT}
+      - --ws.addr
+      - 0.0.0.0
+      - --ws.origins=*
+      - --port
+      - ${BOR_P2P_PORT}
+      - --txpool.locals
+      - ${TX_LOCAL_ADDR}
+      - --txpool.globalslots
+      - "100000"
+      - --rpc.txfeecap
+      - "0" 
+      - --txpool.accountslots
+      - "256" 
+      - --bor.heimdall
+      - http://heimdallr:1317
+      - --bootnodes
+      - "${BOR_BOOTNODES}"
+      - --syncmode
+      - "full"
+      - --txpool.accountqueue
+      - "64"
+      - --txpool.globalqueue
+      - "131072"
+      - --maxpeers
+      - "150"
+      - --http
+      - --http.addr
+      - 0.0.0.0
+      - --http.vhosts=*
+      - --http.api
+      - eth,net,web3,txpool,bor
+      - --http.port
+      - ${BOR_RPC_PORT}
+      - --networkid
+      - ${BOR_CHAIN_ID}
+      - --ethstats
+      - ${BOR_NODE_ID}:mainnet@bor-mainnet.vitwit.com:3000
+    volumes:
+      - ./bor-data:/var/lib/bor
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - ${BOR_RPC_PORT}:${BOR_RPC_PORT}/tcp
+      - ${BOR_WS_PORT}:${BOR_WS_PORT}/tcp
+      - ${BOR_P2P_PORT}:${BOR_P2P_PORT}/tcp
+      - ${BOR_P2P_PORT}:${BOR_P2P_PORT}/udp
