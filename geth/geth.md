@@ -14,6 +14,10 @@ Start node (If you do not use traefik, specify the compose file with the `-f doc
 ```bash
 docker-compose up -d geth
 ```
+To see the sync status run:
+`curl -X POST --data '{"jsonrpc": "2.0", "id": 1, "method": "eth_syncing"}' -H 'Content-Type: application/json' -s https://${DOMAIN}/geth-http/`
+* `currentBlock` - your node current height;
+* `highestBlock` - network height.
 
 ## Upgrade
 ```bash

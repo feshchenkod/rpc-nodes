@@ -20,6 +20,11 @@ docker-compose build
 docker-compose up -d rabbitmq heimdalld heimdallr bor
 ```
 
+To see the sync status run:
+`curl -X POST --data '{"jsonrpc": "2.0", "id": 1, "method": "eth_syncing"}' -H 'Content-Type: application/json' -s https://${DOMAIN}/bor-http/`
+* `currentBlock` - your node current height;
+* `highestBlock` - network height.
+
 ## Upgrade
 Periodically check for new versions. if there is a release, then you need to update the tag (`BOR_TAG`) in the environment file. 
 ```bash
