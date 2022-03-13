@@ -28,6 +28,8 @@ services:
       - "0.0.0.0"
       - --http.port
       - "${HTTP_PORT}"
+      - --http.rpcprefix
+      - "/"
       - --http.corsdomain=*
       - --http.vhosts=*
       - --http.api
@@ -37,6 +39,8 @@ services:
       - "0.0.0.0"
       - --ws.port
       - "${WS_PORT}"
+      - --ws.rpcprefix
+      - "/"
       - --ws.origins=*
       - --ws.api
       - "eth,net,web3,txpool"

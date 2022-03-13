@@ -114,6 +114,8 @@ services:
       - --ws
       - --ws.port
       - ${BOR_WS_PORT}
+      - --ws.rpcprefix
+      - "/"
       - --ws.addr
       - 0.0.0.0
       - --ws.origins=*
@@ -147,6 +149,8 @@ services:
       - eth,net,web3,txpool,bor
       - --http.port
       - ${BOR_RPC_PORT}
+      - --http.rpcprefix
+      - "/"
       - --networkid
       - ${BOR_CHAIN_ID}
       - --ethstats
