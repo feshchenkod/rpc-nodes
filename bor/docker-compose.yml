@@ -139,6 +139,8 @@ services:
       - "64"
       - --txpool.globalqueue
       - "131072"
+      - --txpool.pricelimit
+      - "30000000000"
       - --maxpeers
       - "150"
       - --http
