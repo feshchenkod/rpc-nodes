@@ -6,12 +6,14 @@ services:
     container_name: bsc-pruning
     entrypoint:
       - bsc
+      - --datadir
+      - "/bsc/.ethereum"
       - snapshot
       - prune-state
     restart: "no"
     volumes:
-      - ./bsc-data:/root/.ethereum
-      - ./config.toml:/root/.ethereum/config.toml
+      - ./bsc-data:/bsc/.ethereum
+      - ./config.toml:/bsc/config/config.toml
 
   bsc:
     image: bsc:local
@@ -24,8 +26,10 @@ services:
     entrypoint:
       - docker-entrypoint.sh
       - bsc
+      - --datadir
+      - "/bsc/.ethereum"
       - --config
-      - "/root/.ethereum/config.toml"
+      - "/bsc/config/config.toml"
       - --port
       - "${P2P_PORT}"
       - --rpc.allow-unprotected-txs
@@ -62,5 +66,5 @@ services:
       - ${WS_PORT}:${WS_PORT}
       - ${P2P_PORT}:${P2P_PORT}
     volumes:
-      - ./bsc-data:/root/.ethereum
-      - ./config.toml:/root/.ethereum/config.toml
+      - ./bsc-data:/bsc/.ethereum
+      - ./config.toml:/bsc/config/config.toml
