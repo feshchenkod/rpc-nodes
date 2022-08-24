@@ -44,6 +44,8 @@ services:
       - "1"
       - --Sync.AncientReceiptsBarrier
       - "1"
+      - --Pruning.FullPruningThresholdMb
+      - "180000"
     volumes:
       - ./nethermind-data:/var/lib/nethermind
     labels:

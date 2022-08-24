@@ -2,7 +2,7 @@
 
 ## Requirements for Xdai network
 * memory: 16Gb
-* disk: 200Gb SSD
+* disk: 240Gb SSD (prune at ~180Gb)
 
 ## Installation
 Set the domain name to be used in the `.env` file. You can also set a list of allowed IP addresses there. Rename `example.env` to `.env`:
@@ -25,3 +25,19 @@ To see the sync status run:
 docker-compose pull
 docker-compose up -d
 ```
+
+## Pruning
+1. Restart node with admin methods enabled:
+```
+- --JsonRpc.EnabledModules
+- "Admin,Web3,Eth,Subscribe,Net,Parity"
+```
+2. Send prune command:
+```
+curl --data '{"method":"admin_prune","params":[],"id":1,"jsonrpc":"2.0"}' -H "Content-Type: application/json" -X POST localhost:8545
+```
+3. Watch pruning process:
+```
+docker logs nethermind --since 60m -f | grep 'Pruning'
+```
+4. Disable admin methods.
