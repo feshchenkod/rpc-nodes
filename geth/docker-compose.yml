@@ -58,12 +58,20 @@ services:
       - "0"
       - --rpc.txfeecap
       - "0"
+      - --authrpc.addr
+      - "0.0.0.0"
+      - --authrpc.port
+      - "${AUTH_PORT}"
+      - --authrpc.jwtsecret
+      - "/secrets/jwtsecret"
+      - --authrpc.vhosts=*
     ports:
       # - ${HTTP_PORT}:${HTTP_PORT}
       # - ${WS_PORT}:${WS_PORT}
       - ${P2P_PORT}:${P2P_PORT}
     volumes:
       - ./geth-data:/root/.ethereum
+      - ./secrets:/secrets
     stop_grace_period: 3m30s
     stop_signal: SIGINT
     healthcheck:
@@ -89,6 +97,35 @@ services:
       - "traefik.http.routers.geth-ws.entrypoints=websecure"
       - "traefik.http.routers.geth-ws.tls.certresolver=myresolver"
       - "traefik.http.services.geth-ws.loadbalancer.server.port=${WS_PORT}"
+    networks:
+      - rpc
+
+  lighthouse-mainnet:
+    image: sigp/lighthouse:latest-modern
+    hostname: lighthouse-mainnet
+    restart: unless-stopped
+    command: |
+      lighthouse beacon_node
+      --network mainnet
+      --eth1-endpoints $RPC_URL
+      --datadir /home/.eth2/beaconchaindata
+      --discovery-port ${CL_P2P_PORT}
+      --port ${CL_P2P_PORT}
+      --http
+      --http-address 0.0.0.0
+      --enr-address $PUBLIC_IP
+      --enr-udp-port ${CL_P2P_PORT}
+      --target-peers $TARGET_PEERS
+      --debug-level $LOG_LEVEL
+      --execution-endpoint $EXECUTION_ENDPOINT
+      --execution-jwt "/secrets/jwtsecret"
+    # --checkpoint-sync-url $CHECKPOINT_RPC_URL
+    ports:
+      - '${CL_P2P_PORT}:${CL_P2P_PORT}/tcp'
+      - '${CL_P2P_PORT}:${CL_P2P_PORT}/udp'
+    volumes:
+      - ./lighthouse-data:/home/.eth2/beaconchaindata
+      - ./secrets:/secrets
     networks:
       - rpc
 

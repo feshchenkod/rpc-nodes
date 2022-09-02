@@ -25,6 +25,22 @@ docker-compose pull
 docker-compose up -d geth
 ```
 
+### Prepare to The Merge
+Set `PUBLIC_IP` in `.env`.
+
+Create a jwtsecret file:
+```bash
+openssl rand -hex 32 | tr -d "\n" | sudo tee /secrets/jwtsecret
+sudo chmod 644 /secrets/jwtsecret
+```
+
+Update to latest EL / CL node software:
+```
+docker-compose pull
+docker-compose up -d geth lighthouse-mainnet
+```
+
+
 ## Pruning 
 Use it if the size is approaching 800 GB. At least 120 GB must be free for successful pruning.
 ```bash
