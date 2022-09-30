@@ -1,7 +1,7 @@
 # BSC node
 
 ## Requirements for Ethereum network
-* memory: 48Gb
+* memory: 36b
 * disk: 3Tb SSD (require periodically prune state) - the size increases quickly, so you need to periodically check the remaining space.
 
 ## Installation

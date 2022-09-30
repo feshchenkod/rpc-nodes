@@ -8,7 +8,7 @@ TrieTimeout = 100000000000
 EnablePreimageRecording = false
 EWASMInterpreter = ""
 EVMInterpreter = ""
-DatabaseCache = 8192
+DatabaseCache = 4096
 DatabaseFreezer = ""
 
 [Eth.Miner]

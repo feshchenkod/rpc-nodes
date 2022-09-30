@@ -57,7 +57,7 @@ services:
       - --txpool.locals
       - "${TX_LOCAL_ADDR}"
       - --cache
-      - "20480"
+      - "16394"
     restart: always
     stop_grace_period: 4m
     stop_signal: SIGINT
