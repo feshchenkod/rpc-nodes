@@ -26,6 +26,22 @@ docker-compose pull
 docker-compose up -d
 ```
 
+### Prepare to The Merge
+Set `PUBLIC_IP` in `.env`.
+
+Create a jwtsecret file:
+```bash
+openssl rand -hex 32 | tr -d "\n" | sudo tee ./secrets/jwtsecret
+sudo chmod 644 ./secrets/jwtsecret
+```
+
+Update to latest EL / CL node software:
+```
+docker-compose down
+docker-compose pull
+docker-compose up -d nethermind-xdai lighthouse-xdai
+```
+
 ## Pruning
 1. Restart node with admin methods enabled:
 ```
