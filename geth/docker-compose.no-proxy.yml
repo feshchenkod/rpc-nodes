@@ -89,6 +89,7 @@ services:
       --port ${CL_P2P_PORT}
       --http
       --http-address 0.0.0.0
+      --http-port ${CL_HTTP_PORT}
       --enr-address $PUBLIC_IP
       --enr-udp-port ${CL_P2P_PORT}
       --target-peers $TARGET_PEERS
@@ -99,6 +100,7 @@ services:
     ports:
       - '${CL_P2P_PORT}:${CL_P2P_PORT}/tcp'
       - '${CL_P2P_PORT}:${CL_P2P_PORT}/udp'
+      # - '${CL_HTTP_PORT}:${CL_HTTP_PORT}'
     volumes:
       - ./lighthouse-data:/home/.eth2/beaconchaindata
       - ./secrets:/secrets
