@@ -12,7 +12,7 @@ mv example.env .env
 
 Start node (If you do not use traefik, specify the compose file with the `-f docker-compose.no-proxy.yml`):
 ```bash
-docker-compose up -d geth
+docker-compose up -d geth lighthouse-mainnet
 ```
 To see the sync status run:
 `curl -X POST --data '{"jsonrpc": "2.0", "id": 1, "method": "eth_syncing"}' -H 'Content-Type: application/json' -s https://${DOMAIN}/geth-http/`
@@ -22,7 +22,7 @@ To see the sync status run:
 ## Upgrade
 ```bash
 docker-compose pull
-docker-compose up -d geth
+docker-compose up -d geth lighthouse-mainnet
 ```
 
 ### Prepare to The Merge
@@ -44,8 +44,8 @@ docker-compose up -d geth lighthouse-mainnet
 ## Pruning 
 Use it if the size is approaching 800 GB. At least 120 GB must be free for successful pruning.
 ```bash
-docker-compose down
+docker-compose stop geth
 docker-compose up geth-pruning
 docker-compose down
-docker-compose up -d geth
+docker-compose up -d geth lighthouse-mainnet
 ```
